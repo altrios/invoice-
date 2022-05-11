@@ -1,0 +1,103 @@
+'use strict';
+const pool = require('./../../config/db.config');
+var User = function (user) {
+	this.id_document_type = user.id_document_type;
+	this.document = user.document;
+	this.name = user.name;
+	this.last_name = user.last_name;
+	this.email = user.email;
+	this.password = user.password;
+	this.phone = user.phone;
+	this.id_user_state = user.id_user_state;
+};
+
+User.create = function (newUser, result) {
+	pool.query("SELECT * FROM users WHERE document = ? AND id_document_type = ? AND id_user_state != 1 OR email = ?",
+		[newUser.document, newUser.id_document_type, newUser.email],
+		(errorConsult, dataConsult) => {
+			if (errorConsult) {
+				result(errorConsult, null);
+			} else {
+				if (dataConsult.length == 0) {
+					pool.query("INSERT INTO users SET ?", newUser, (error, data) => {
+						if (error) {
+							result(error, null);
+						} else {
+							result(null, data.insertId);
+						}
+					});
+				} else {
+					result("The user is already registered in the system", null);
+				}
+			}
+		});
+};
+
+User.findById = function (id, result) {
+	pool.query("SELECT * FROM users WHERE id = ? ", id, (err, res) => {
+		if (err) {
+			result(err, null);
+		} else {
+			result(null, res);
+		}
+	});
+};
+
+User.findByDocument = function (document, result) {
+	pool.query("SELECT * FROM users WHERE document = ? AND id_user_state = 1", document, (err, res) => {
+		if (err) {
+			result(err, null);
+		} else {
+			result(null, res);
+		}
+	});
+}
+
+User.findAll = async function (pagination, result) {
+	const offset = (pagination.page - 1) * pagination.limit;
+	const total = await pool.query("SELECT COUNT(*) FROM users WHERE id_user_state = 1");
+	const totalPages = Math.ceil(total[0]['COUNT(*)'] / pagination.limit);
+	pool.query(`SELECT * FROM users WHERE id_user_state = 1 LIMIT ${pagination.limit} OFFSET ${offset}`, (err, res) => {
+		if (err) {
+			result(err, null, null);
+		} else {
+			result(null, res, { totalPages: totalPages, totalItems: total[0]['COUNT(*)'], currentPage: pagination.page, itemsPerPage: pagination.limit });
+		}
+	});
+};
+
+User.update = function (id, user, result) {
+	pool.query("UPDATE users SET ? WHERE document = ? AND id_user_state = 1", [user, id], (err, res) => {
+		if (err) {
+			result(err, null);
+		} else {
+			result(null, res);
+		}
+	});
+};
+
+User.delete = function (docuemnt, result) {
+	pool.query("UPDATE users SET id_user_state = 2 WHERE document = ?", docuemnt, (err, res) => {
+		if (err) {
+			result(err, null);
+		} else {
+			result(null, res);
+		}
+	});
+};
+
+User.login= function(user, result) {
+	pool.query("SELECT * FROM users WHERE email = ? AND password = ?", [user.email, user.password], (err, res) => {
+		if (err) {
+			result(err, null);
+		} else {
+			if(res.length != 0){
+				result(null, res);
+			} else {
+				result("Usuario o contraseña incorrectas", null);
+			}
+		}
+	});
+}
+
+module.exports = User;
