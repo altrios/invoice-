@@ -14,17 +14,23 @@ router.get('/', celebrate({
 
 router.post('/', celebrate({
     body: Joi.object().keys({
-        id_document_type: Joi.number().integer().positive().required(),
-        document: Joi.string().required(),
+        
         name: Joi.string().required(),
         last_name: Joi.string().required(),
         email: Joi.string().email().required(),
+        country:Joi.number().integer().positive().required(),
+        documentation_type: Joi.number().integer().positive().required(),
+        documentation: Joi.string().required(),
         password: Joi.string().required(),
-        phone: Joi.string().required(),
-        id_user_state: Joi.number().integer().positive().required()
+        nickname: Joi.string().required(),
+        id_user_state: Joi.number().integer().positive().required(),
+        user_type: Joi.number().integer().positive().required(),
+        phone: Joi.string().required()
+        
     }).unknown()
 }), (err, req, res, next) => {
-    res.status(400).send({ status: false, message: 'Faltan datos por enviar' });
+     console.log(err)
+    res.status(400).send({ status: false, message: 'Faltan datos por enviarrr' });
 }, userController.create);
 
 
@@ -42,8 +48,8 @@ router.put('/:id', celebrate({
         id: Joi.number().integer().positive().required(),
     }).unknown(),
     body: Joi.object().keys({
-        id_document_type: Joi.number().integer().positive().required(),
-        document: Joi.string().required(),
+        documentation_type: Joi.number().integer().positive().required(),
+        documentation: Joi.string().required(),
         name: Joi.string().required(),
         last_name: Joi.string().required(),
         email: Joi.string().email().required(),
@@ -51,7 +57,7 @@ router.put('/:id', celebrate({
         id_user_state: Joi.string().required()
     }).unknown()
 }), (err, req, res, next) => {
-    res.status(400).send({ status: false, message: 'Faltan datos por enviar' });
+    res.status(400).send({ status: false, message: w });
 }, userController.update);
 
 

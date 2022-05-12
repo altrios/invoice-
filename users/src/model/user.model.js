@@ -1,19 +1,24 @@
 'use strict';
 const pool = require('./../../config/db.config');
 var User = function (user) {
-	this.id_document_type = user.id_document_type;
-	this.document = user.document;
+	this.documentation_type = user.documentation_type;
+	this.documentation = user.documentation;
 	this.name = user.name;
 	this.last_name = user.last_name;
 	this.email = user.email;
 	this.password = user.password;
 	this.phone = user.phone;
 	this.id_user_state = user.id_user_state;
+	this.user_type=1;
+	this.nickname='prueba'+user.id_user_state;
+	this.country=1;
+
 };
 
 User.create = function (newUser, result) {
-	pool.query("SELECT * FROM users WHERE document = ? AND id_document_type = ? AND id_user_state != 1 OR email = ?",
-		[newUser.document, newUser.id_document_type, newUser.email],
+	console.log(newUser)
+	pool.query("SELECT * FROM users WHERE documentation = ? AND documentation_type = ? AND id_user_state != 1 OR email = ?",
+		[newUser.documentation, newUser.documentation_type, newUser.email],
 		(errorConsult, dataConsult) => {
 			if (errorConsult) {
 				result(errorConsult, null);
