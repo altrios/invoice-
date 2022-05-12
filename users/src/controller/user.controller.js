@@ -100,26 +100,57 @@ exports.findByDocument = function (req, res) {
 }
 
 exports.update = function (req, res) {
-  User.update(req.params.id, new User(req.body), (err, user) => {
+  let date_ob = new Date()
+  let Toeknkey =
+    date_ob.getFullYear() + '/' + date_ob.getMonth() + '/' + date_ob.getDate()
+  jwt.verify(req.body.token.replace('"', ''), Toeknkey, function (err, data) {
     if (err) {
-      res.status(500).send({
+      res.status(400).send({
         error: true,
-        err,
+        message: 'User not deleted',
       })
     } else {
-      console.log(user)
-      if(user=='no match'){
-        res.status(404).send({
-          error: true,
-          message: 'No matched user',
-        })
-      }else{
-        res.status(200).send({
-        error: false,
-        message: 'User successfully updated',
+      User.findById(data.data[0]['id'], (err, userData) => {
+        if (err) {
+          res.status(500).send({
+            error: true,
+            err,
+          })
+        } else {
+          console.log(userData[0]['id'])
+          console.log(data.data[0]['id'])
+          if (userData[0]['id'] != data.data[0]['id']) {
+            res.status(400).send({
+              error: true,
+              message: 'you are not autorized to do this',
+            })
+          } else {
+            User.update(req.params.id, new User(req.body), (err, user) => {
+              if (err) {
+                res.status(500).send({
+                  error: true,
+                  err,
+                })
+              } else {
+                // console.log(user)
+
+                console.log(data.data[0]['id'])
+                if (user == 'no match') {
+                  res.status(404).send({
+                    error: true,
+                    message: 'No matched user',
+                  })
+                } else {
+                  res.status(200).send({
+                    error: false,
+                    message: 'User successfully updated',
+                  })
+                }
+              }
+            })
+          }
+        }
       })
-      }
-      
     }
   })
 }
