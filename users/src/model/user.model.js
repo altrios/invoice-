@@ -76,8 +76,8 @@ User.update = function (id, user, result) {
 	});
 };
 
-User.delete = function (docuemnt, result) {
-	pool.query("UPDATE users SET id_user_state = 2 WHERE document = ?", docuemnt, (err, res) => {
+User.delete = function (id, result) {
+	pool.query("UPDATE users SET id_user_state = 2 WHERE id = ?", id, (err, res) => {
 		if (err) {
 			result(err, null);
 		} else {

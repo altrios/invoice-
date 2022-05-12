@@ -116,17 +116,55 @@ exports.update = function (req, res) {
 }
 
 exports.delete = function (req, res) {
-  User.delete(req.params.id, (err, user) => {
+  let date_ob = new Date()
+  let Toeknkey =
+    date_ob.getFullYear() + '/' + date_ob.getMonth() + '/' + date_ob.getDate()
+  jwt.verify(req.body.token.replace('"', ''), Toeknkey, function (err, data) {
     if (err) {
-      res.status(500).send({
+      res.status(400).send({
         error: true,
-        err,
+        message: 'User not deleted',
       })
     } else {
-      res.status(200).send({
-        error: false,
-        message: 'User successfully deleted',
-      })
+      if (
+        req.params.id == data['data'][0]['user_type'] ||
+        data['data'][0]['user_type'] == 3
+      ) {
+        User.delete(req.params.id, (err, user) => {
+          if (err) {
+            res.status(500).send({
+              error: true,
+              err,
+            })
+          } else {
+            User.findById(req.params.id, (err, user) => {
+              if (err) {
+                res.status(500).send({
+                  error: true,
+                  err,
+                })
+              } else {
+                if (user == '') {
+                  res.status(404).send({
+                    error: true,
+                    message: "User dosn't exist",
+                  })
+                } else {
+                  res.status(200).send({
+                    error: false,
+                    message: 'User successfully deleted',
+                  })
+                }
+              }
+            })
+          }
+        })
+      } else {
+        res.status(400).send({
+          error: true,
+          message: 'Unautorized action',
+        })
+      }
     }
   })
 }

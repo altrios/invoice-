@@ -58,6 +58,7 @@ router.put('/:id', celebrate({
 router.delete('/:id', celebrate({
     params: Joi.object().keys({
         id: Joi.number().integer().positive().required(),
+        token:JSON.stringify(Joi.string().min(5).max(255).required()),
     }).unknown()
 }), (err, req, res, next) => {
     res.status(400).send({ status: false, message: 'Faltan datos por enviar' });
@@ -78,7 +79,6 @@ router.post('/:id', celebrate({
         token:JSON.stringify(Joi.string().min(5).max(255).required()),
     }).unknown()
 }), (err, req, res, next) => {
-    console.log(req)
     res.status(400).send({ status: false, message:"no se encontro usuario" });
 }, userController.findById);
 
