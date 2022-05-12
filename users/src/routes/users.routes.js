@@ -54,10 +54,11 @@ router.put('/:id', celebrate({
         last_name: Joi.string().required(),
         email: Joi.string().email().required(),
         phone: Joi.string().required(),
-        id_user_state: Joi.string().required()
+        id_user_state: Joi.number().integer().positive().required()
     }).unknown()
 }), (err, req, res, next) => {
-    res.status(400).send({ status: false, message: w });
+    console.log(err)
+    res.status(400).send({ status: false, message: 'Faltan datos por enviar' });
 }, userController.update);
 
 

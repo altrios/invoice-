@@ -72,11 +72,17 @@ User.findAll = async function (pagination, result) {
 };
 
 User.update = function (id, user, result) {
-	pool.query("UPDATE users SET ? WHERE document = ? AND id_user_state = 1", [user, id], (err, res) => {
+	pool.query("UPDATE users SET ? WHERE documentation = ? AND id_user_state = 1", [user, id], (err, res) => {
+		
 		if (err) {
 			result(err, null);
 		} else {
-			result(null, res);
+			if(res.message.indexOf("matched: 0")!=-1){
+				result(null, 'no match');
+			}else{
+				result(null, res);	
+			}
+			
 		}
 	});
 };

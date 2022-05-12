@@ -107,10 +107,19 @@ exports.update = function (req, res) {
         err,
       })
     } else {
-      res.status(200).send({
+      console.log(user)
+      if(user=='no match'){
+        res.status(404).send({
+          error: true,
+          message: 'No matched user',
+        })
+      }else{
+        res.status(200).send({
         error: false,
         message: 'User successfully updated',
       })
+      }
+      
     }
   })
 }
