@@ -103,14 +103,14 @@ exports.update = function (req, res) {
   let date_ob = new Date()
   let Toeknkey =
     date_ob.getFullYear() + '/' + date_ob.getMonth() + '/' + date_ob.getDate()
-  jwt.verify(req.body.token.replace('"', ''), Toeknkey, function (err, data) {
+  jwt.verify(req.body.token.replace('"', ''), Toeknkey, function (err, data) {//verificamos token
     if (err) {
       res.status(400).send({
         error: true,
         message: 'User not deleted',
       })
     } else {
-      User.findById(data.data[0]['id'], (err, userData) => {
+      User.findById(data.data[0]['id'], (err, userData) => {//ubicamos usuario
         if (err) {
           res.status(500).send({
             error: true,
@@ -119,12 +119,12 @@ exports.update = function (req, res) {
         } else {
           console.log(userData[0]['id'])
           console.log(data.data[0]['id'])
-          if (userData[0]['id'] != data.data[0]['id']) {
+          if (userData[0]['id'] != data.data[0]['id']) {//si el ususario no coincide con el usuario en sesion negamos el cambio
             res.status(400).send({
               error: true,
               message: 'you are not autorized to do this',
             })
-          } else {
+          } else {//si hay coinsidencia procedemos con hacer el cambio
             User.update(req.params.id, new User(req.body), (err, user) => {
               if (err) {
                 res.status(500).send({
@@ -133,9 +133,7 @@ exports.update = function (req, res) {
                 })
               } else {
                 // console.log(user)
-
-                console.log(data.data[0]['id'])
-                if (user == 'no match') {
+                if (user == 'no match') {//si intentamos cambiar un usuario que no existe negamos el cambio (redundamos en la validacion anterior)
                   res.status(404).send({
                     error: true,
                     message: 'No matched user',
@@ -166,7 +164,7 @@ exports.delete = function (req, res) {
         message: 'User not deleted',
       })
     } else {
-      if (
+      if (//comparamos si el id del token y el id del usuario que queremos "eliminar" coinciden
         req.params.id == data['data'][0]['user_type'] ||
         data['data'][0]['user_type'] == 3
       ) {
@@ -177,7 +175,7 @@ exports.delete = function (req, res) {
               err,
             })
           } else {
-            User.findById(req.params.id, (err, user) => {
+            User.findById(req.params.id, (err, user) => {//revisamos si el usuario que queremos eliminar existe
               if (err) {
                 res.status(500).send({
                   error: true,
@@ -228,7 +226,7 @@ exports.login = function (req, res) {
       res.status(200).send({
         status: false,
         data: data,
-        token: jwt.sign({ data }, Toeknkey),
+        token: jwt.sign({ data }, Toeknkey),//al iniciar sesion creamos un token que sera el que usaremos para cada api
       })
     }
   })
