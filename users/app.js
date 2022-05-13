@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cors());
 app.use(fileupload());
-const oneDay = 1000 * 60 * 60 * 24;
+
 
 app.get('/', (req, res) => {
     res.status(200).send({ status: "Server for 'invoicePlus' is works!"});
