@@ -29,11 +29,11 @@ Company.create = async function (newCompany, result) {
 }
 
 Company.findById = function (id, result) {
-	pool.query('SELECT * FROM company INNER JOIN user ON company.user_id = user.id WHERE user.id = ?', id, function (err, res) {
+	pool.query('SELECT * FROM company INNER JOIN users ON company.user_id = users.id WHERE users.id = ?', id, function (err, res) {
 		if (err) {
 			result(err, null);
 		} else {
-			console.log(res)
+			
 			const resultStructure = {
 				id: 1,
 				business_name: 1,
@@ -65,7 +65,7 @@ Company.findAll = async function ( pagination, result) {
 	const offset = (pagination.page - 1) * pagination.limit;console.log(pagination)
 	const total = await pool.query("SELECT COUNT(*) FROM company WHERE id_company_state = 1");
 	const totalPages = Math.ceil(total[0]['COUNT(*)'] / pagination.limit);
-	console.log(totalPages)
+	
 	pool.query(`SELECT * FROM company WHERE user_id = ${pagination.id} and id_company_state = 1 LIMIT ${pagination.limit} OFFSET ${offset}`, function (err, res) {
 		if (err) {
 			result(err, null, null);
