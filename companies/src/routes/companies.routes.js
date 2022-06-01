@@ -33,9 +33,13 @@ router.post('/', celebrate({
 router.post('/:id', celebrate({
     params: Joi.object().keys({
         id: Joi.number().integer().positive().required(),
-        token: Joi.string().required(),
+        
+    }).unknown(),
+    body: Joi.object().keys({
+        token:Joi.string().required(),
     }).unknown()
 }), (err, req, res, next) => {
+    
     res.status(400).send({ status: false, message: 'Faltan datos por enviar o no son correctos' });
 }, companyController.findById);
 
@@ -53,20 +57,25 @@ router.put('/:id', celebrate({
         user_id: Joi.number().integer().positive().required(),
         phone: Joi.string().required(),
         id_company_state: Joi.number().integer().positive().required(),
-        token:Joi.string().required(),
+        
     }).unknown()
 }), (err, req, res, next) => {
     console.log(err )
-    res.status(400).send({ status: false, message: 'Faltan datos por enviar o no son correctoss' });
+    res.status(400).send({ status: false, message: 'Faltan datos por enviar o no son correctos' });
 }, companyController.update);
 
 router.delete('/:id', celebrate({
     params: Joi.object().keys({
         id: Joi.number().integer().positive().required(),
-        token: Joi.string().required(),
+    }).unknown(),
+    body: Joi.object().keys({
+        
+        token:Joi.string().required(),
     }).unknown()
 }), (err, req, res, next) => {
     
+    console.log(req)
+    console.log(err)
     res.status(400).send({ status: false, message: 'Faltan datos por enviar o no son correctos' });
 }, companyController.delete);
 
