@@ -115,8 +115,10 @@ exports.findById = function (req, res) {
 }
 
 exports.update = function (req, res) {
+  console.log(req)
   Company.update(req.params.id, new Company(req.body), function (err, user) {
     if (err) {
+      console.log(err)
       res.status(500).send({
         error: true,
         err,
