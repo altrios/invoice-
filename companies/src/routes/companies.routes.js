@@ -57,7 +57,7 @@ router.put('/:id', celebrate({
     }).unknown()
 }), (err, req, res, next) => {
     console.log(err )
-    res.status(400).send({ status: false, message: 'Faltan datos por enviar o no son correctossss' });
+    res.status(400).send({ status: false, message: 'Faltan datos por enviar o no son correctoss' });
 }, companyController.update);
 
 router.delete('/:id', celebrate({
