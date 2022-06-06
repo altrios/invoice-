@@ -15,17 +15,16 @@ exports.findAll = function (req, res) {
       const tokenIsOk = testToken(req.body.token.replace('"', ''))
       //verificamos token
       if (tokenIsOk == true) {
-          console.log('error')
-          console.log(err)
-          res.status(500).send({
-            error: true,
-            message: 'Bad Token',
-            err,
-          })
-        } else {
-          res.status(200).send({ users, pagination })
-        }
-      
+        console.log('error')
+        console.log(err)
+        res.status(500).send({
+          error: true,
+          message: 'Bad Token',
+          err,
+        })
+      } else {
+        res.status(200).send({ users, pagination })
+      }
     }
   })
 }
@@ -93,7 +92,7 @@ exports.update = function (req, res) {
   if (tokenIsOk == true) {
     res.status(400).send({
       error: true,
-      message: 'User not deleted',
+      message: 'User not Updated',
     })
   } else {
     User.findById(data.data[0]['id'], (err, userData) => {
@@ -143,59 +142,56 @@ exports.update = function (req, res) {
 }
 
 exports.delete = function (req, res) {
-  let date_ob = new Date()
-  let Toeknkey =
-    date_ob.getFullYear() + '/' + date_ob.getMonth() + '/' + date_ob.getDate()
-  jwt.verify(req.body.token.replace('"', ''), Toeknkey, function (err, data) {
-    if (err) {
-      res.status(400).send({
-        error: true,
-        message: 'User not deleted',
-      })
-    } else {
-      if (
-        //comparamos si el id del token y el id del usuario que queremos "eliminar" coinciden
-        req.params.id == data['data'][0]['user_type'] ||
-        data['data'][0]['user_type'] == 3
-      ) {
-        User.delete(req.params.id, (err, user) => {
-          if (err) {
-            res.status(500).send({
-              error: true,
-              err,
-            })
-          } else {
-            User.findById(req.params.id, (err, user) => {
-              //revisamos si el usuario que queremos eliminar existe
-              if (err) {
-                res.status(500).send({
+  const tokenIsOk = testToken(req.body.token)
+  //verificamos token
+  if (tokenIsOk == true) {
+    res.status(400).send({
+      error: true,
+      message: 'User not deleted',
+    })
+  } else {
+    if (
+      //comparamos si el id del token y el id del usuario que queremos "eliminar" coinciden
+      req.params.id == data['data'][0]['user_type'] ||
+      data['data'][0]['user_type'] == 3
+    ) {
+      User.delete(req.params.id, (err, user) => {
+        if (err) {
+          res.status(500).send({
+            error: true,
+            err,
+          })
+        } else {
+          User.findById(req.params.id, (err, user) => {
+            //revisamos si el usuario que queremos eliminar existe
+            if (err) {
+              res.status(500).send({
+                error: true,
+                err,
+              })
+            } else {
+              if (user == '') {
+                res.status(404).send({
                   error: true,
-                  err,
+                  message: "User dosn't exist",
                 })
               } else {
-                if (user == '') {
-                  res.status(404).send({
-                    error: true,
-                    message: "User dosn't exist",
-                  })
-                } else {
-                  res.status(200).send({
-                    error: false,
-                    message: 'User successfully deleted',
-                  })
-                }
+                res.status(200).send({
+                  error: false,
+                  message: 'User successfully deleted',
+                })
               }
-            })
-          }
-        })
-      } else {
-        res.status(400).send({
-          error: true,
-          message: 'Unautorized action',
-        })
-      }
+            }
+          })
+        }
+      })
+    } else {
+      res.status(400).send({
+        error: true,
+        message: 'Unautorized action',
+      })
     }
-  })
+  }
 }
 
 exports.login = function (req, res) {

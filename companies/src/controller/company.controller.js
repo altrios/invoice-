@@ -34,69 +34,64 @@ exports.findAll = function (req, res) {
 }
 
 exports.create = function (req, res) {
-  let date_ob = new Date()
-  let tokenkey =
-    date_ob.getFullYear() + '/' + date_ob.getMonth() + '/' + date_ob.getDate()
-  // console.log(req.body)
-  // console.log(tokenkey)
-  jwt.verify(req.body.token.replace('"', ''), tokenkey, function (err, data) {
-    if (err) {
-      console.log('error')
-      console.log(err)
-      res.status(500).send({
-        error: true,
-        message: 'Bad Token',
-        err,
-      })
-    } else {
-      console.log(data.data[0]['id'])
-      req.body.user_id = data.data[0]['id']
-      console.log(data)
-      console.log(req.files)
-      req.body.rut_pdf = req.files.rut.name
-      req.body.chamber_commerce_pdf = req.files.chamber.name
-      const new_company = new Company(req.body)
-      Company.create(new_company, (err, user) => {
-        if (err) {
-          res.status(500).send({
-            error: true,
-            err,
-          })
-        } else {
-          const filerut = req.files.rut
-          filerut.mv('./uploads/rut/' + filerut.name, function (err, result) {
+  const tokenIsOk = testToken(req.body.token)
+  //verificamos token
+  if (tokenIsOk == true) {
+    console.log('error')
+    console.log(err)
+    res.status(500).send({
+      error: true,
+      message: 'Bad Token',
+      err,
+    })
+  } else {
+    console.log(data.data[0]['id'])
+    req.body.user_id = data.data[0]['id']
+    console.log(data)
+    console.log(req.files)
+    req.body.rut_pdf = req.files.rut.name
+    req.body.chamber_commerce_pdf = req.files.chamber.name
+    const new_company = new Company(req.body)
+    Company.create(new_company, (err, user) => {
+      if (err) {
+        res.status(500).send({
+          error: true,
+          err,
+        })
+      } else {
+        const filerut = req.files.rut
+        filerut.mv('./uploads/rut/' + filerut.name, function (err, result) {
+          if (err) {
+            console.log(err)
+          } else {
+            console.log(result)
+          }
+
+          console.log('se subio el archivo ' + filerut.name)
+        })
+
+        const filechamber = req.files.chamber
+        filechamber.mv(
+          './uploads/chambercomerce/' + filechamber.name,
+          function (err, result) {
+            // console.log(reportUploaded);
             if (err) {
               console.log(err)
             } else {
               console.log(result)
             }
 
-            console.log('se subio el archivo ' + filerut.name)
-          })
-
-          const filechamber = req.files.chamber
-          filechamber.mv(
-            './uploads/chambercomerce/' + filechamber.name,
-            function (err, result) {
-              // console.log(reportUploaded);
-              if (err) {
-                console.log(err)
-              } else {
-                console.log(result)
-              }
-
-              console.log('se subio el archivo ' + filechamber.name)
-            },
-          )
-          res.status(200).send({
-            error: false,
-            message: 'Company added successfully!',
-            data: user,
-          })
-        }
-      })
-    }
-  })
+            console.log('se subio el archivo ' + filechamber.name)
+          },
+        )
+        res.status(200).send({
+          error: false,
+          message: 'Company added successfully!',
+          data: user,
+        })
+      }
+    })
+  }
 }
 
 exports.findById = function (req, res) {
@@ -172,17 +167,37 @@ exports.delete = function (req, res) {
 }
 
 function testToken(token) {
-  let date_ob = new Date()
-  let result = ''
-  let Toeknkey =
-    date_ob.getFullYear() + '/' + date_ob.getMonth() + '/' + date_ob.getDate()
-
-  jwt.verify(token.replace('"', ''), Toeknkey, function (err, data) {
+  var axios = require('axios')
+  var result = ''
+  User.endpoint('verficate_token', (err, data) => {
     if (err) {
-      result = false
+      console.log(err)
+      result = err
     } else {
-      result = true
+      url = JSON.parse(data[0]['url'])
+
+      var data = JSON.stringify({
+        token: token,
+      })
+
+      var config = {
+        method: 'post',
+        url: url.endpoint,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: data,
+      }
+
+      axios(config)
+        .then(function (response) {
+          console.log(JSON.stringify(response.data))
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
     }
   })
+
   return result
 }
