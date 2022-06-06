@@ -9,7 +9,8 @@ router.get('/', celebrate({
         page: Joi.number().integer().positive().required()
     }).unknown()
 }), (err, req, res, next) => {
-    res.status(400).send({ status: false, message: 'Faltan datos por enviar' });
+
+    res.status(400).send({ status: false, message: 'Faltan datos por enviar'});
 }, userController.findAll);
 
 router.post('/', celebrate({
@@ -29,8 +30,7 @@ router.post('/', celebrate({
         
     }).unknown()
 }), (err, req, res, next) => {
-     console.log(err)
-    res.status(400).send({ status: false, message: 'Faltan datos por enviarrr' });
+    res.status(400).send({ status: false, message: 'Faltan datos por enviar'});
 }, userController.create);
 
 
@@ -77,8 +77,8 @@ router.post('/login/', celebrate({
         password: Joi.string().required()
     }).unknown()
 }), (err, req, res, next) => {
-    res.status(400).send({ status: false, message: 'Faltan datos por enviar' });
-}, userController.login);
+    res.status(400).send({ status: false, message: 'Faltan datos por enviar'});
+    }, userController.login);
 
 router.post('/:id', celebrate({
     params: Joi.object().keys({

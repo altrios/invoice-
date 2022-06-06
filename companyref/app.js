@@ -1,11 +1,10 @@
 const express = require('express');
 var jwt = require('jsonwebtoken');
 var fileupload = require("express-fileupload");
-var session = require('express-session');
 
 
 // Setup server port
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5002;
 // create express app
 const app = express()
 const cors = require('cors');
@@ -21,7 +20,7 @@ app.get('/', (req, res) => {
     res.status(200).send({ status: "Server for 'invoicePlus' is works!"});
 });
 
-app.use('/api/v1/users', require('./src/routes/users.routes'));
+app.use('/api/v1/companyref', require('./src/Routes/companyref.routes'));
 
 
 // listen for requests

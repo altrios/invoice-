@@ -16,7 +16,6 @@ var User = function (user) {
 };
 
 User.create = function (newUser, result) {
-	console.log(newUser)
 	pool.query("SELECT * FROM users WHERE documentation = ? AND documentation_type = ? AND id_user_state != 1 OR email = ?",
 		[newUser.documentation, newUser.documentation_type, newUser.email],
 		(errorConsult, dataConsult) => {
@@ -109,6 +108,20 @@ User.login= function(user, result) {
 			}
 		}
 	});
+}
+
+User.endpoint=function(name, result){
+	pool.query("SELECT * FROM endpoints WHERE name=?", [name], (err, res)=>{
+		if(err){
+			result(err, null);
+		}else{
+			if(res.length != 0){
+				result(null, res);
+			} else {
+				result("No se encontró el endpoint", null);
+			}
+		}
+	})
 }
 
 module.exports = User;

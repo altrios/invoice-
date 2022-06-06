@@ -98,4 +98,18 @@ Company.delete = function (id, result) {
 	});
 };
 
+Company.endpoint=function(name, result){
+	pool.query("SELECT * FROM endpoints WHERE name=?", [name], (err, res)=>{
+		if(err){
+			result(err, null);
+		}else{
+			if(res.length != 0){
+				result(null, res);
+			} else {
+				result("No se encontró el endpoint", null);
+			}
+		}
+	})
+}
+
 module.exports = Company;

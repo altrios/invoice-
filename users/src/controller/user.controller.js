@@ -12,11 +12,9 @@ exports.findAll = function (req, res) {
         err,
       })
     } else {
-      jwt.verify(req.body.token.replace('"', ''), Toeknkey, function (
-        err,
-        data,
-      ) {
-        if (err) {
+      const tokenIsOk = testToken(req.body.token.replace('"', ''))
+      //verificamos token
+      if (tokenIsOk == true) {
           console.log('error')
           console.log(err)
           res.status(500).send({
@@ -27,7 +25,7 @@ exports.findAll = function (req, res) {
         } else {
           res.status(200).send({ users, pagination })
         }
-      })
+      
     }
   })
 }
@@ -59,29 +57,19 @@ exports.findById = function (req, res) {
         err,
       })
     } else {
-      let date_ob = new Date()
-      let Toeknkey =
-        date_ob.getFullYear() +
-        '/' +
-        date_ob.getMonth() +
-        '/' +
-        date_ob.getDate()
-      jwt.verify(req.body.token.replace('"', ''), Toeknkey, function (
-        err,
-        data,
-      ) {
-        if (err) {
-          console.log('error')
-          console.log(err)
-          res.status(500).send({
-            error: true,
-            message: 'Bad Token',
-            err,
-          })
-        } else {
-          res.status(200).send(user)
-        }
-      })
+      const tokenIsOk = testToken(req.body.token.replace('"', ''))
+      //verificamos token
+      if (tokenIsOk == true) {
+        console.log('error')
+        console.log(err)
+        res.status(500).send({
+          error: true,
+          message: 'Bad Token',
+          err,
+        })
+      } else {
+        res.status(200).send(user)
+      }
     }
   })
 }
@@ -100,57 +88,58 @@ exports.findByDocument = function (req, res) {
 }
 
 exports.update = function (req, res) {
-  let date_ob = new Date()
-  let Toeknkey =
-    date_ob.getFullYear() + '/' + date_ob.getMonth() + '/' + date_ob.getDate()
-  jwt.verify(req.body.token.replace('"', ''), Toeknkey, function (err, data) {//verificamos token
-    if (err) {
-      res.status(400).send({
-        error: true,
-        message: 'User not deleted',
-      })
-    } else {
-      User.findById(data.data[0]['id'], (err, userData) => {//ubicamos usuario
-        if (err) {
-          res.status(500).send({
+  const tokenIsOk = testToken(req.body.token)
+  //verificamos token
+  if (tokenIsOk == true) {
+    res.status(400).send({
+      error: true,
+      message: 'User not deleted',
+    })
+  } else {
+    User.findById(data.data[0]['id'], (err, userData) => {
+      //ubicamos usuario
+      if (err) {
+        res.status(500).send({
+          error: true,
+          err,
+        })
+      } else {
+        console.log(userData[0]['id'])
+        console.log(data.data[0]['id'])
+        if (userData[0]['id'] != data.data[0]['id']) {
+          //si el ususario no coincide con el usuario en sesion negamos el cambio
+          res.status(400).send({
             error: true,
-            err,
+            message: 'you are not autorized to do this',
           })
         } else {
-          console.log(userData[0]['id'])
-          console.log(data.data[0]['id'])
-          if (userData[0]['id'] != data.data[0]['id']) {//si el ususario no coincide con el usuario en sesion negamos el cambio
-            res.status(400).send({
-              error: true,
-              message: 'you are not autorized to do this',
-            })
-          } else {//si hay coinsidencia procedemos con hacer el cambio
-            User.update(req.params.id, new User(req.body), (err, user) => {
-              if (err) {
-                res.status(500).send({
+          //si hay coinsidencia procedemos con hacer el cambio
+          User.update(req.params.id, new User(req.body), (err, user) => {
+            if (err) {
+              res.status(500).send({
+                error: true,
+                err,
+              })
+            } else {
+              // console.log(user)
+              if (user == 'no match') {
+                //si intentamos cambiar un usuario que no existe negamos el cambio (redundamos en la validacion anterior)
+                res.status(404).send({
                   error: true,
-                  err,
+                  message: 'No matched user',
                 })
               } else {
-                // console.log(user)
-                if (user == 'no match') {//si intentamos cambiar un usuario que no existe negamos el cambio (redundamos en la validacion anterior)
-                  res.status(404).send({
-                    error: true,
-                    message: 'No matched user',
-                  })
-                } else {
-                  res.status(200).send({
-                    error: false,
-                    message: 'User successfully updated',
-                  })
-                }
+                res.status(200).send({
+                  error: false,
+                  message: 'User successfully updated',
+                })
               }
-            })
-          }
+            }
+          })
         }
-      })
-    }
-  })
+      }
+    })
+  }
 }
 
 exports.delete = function (req, res) {
@@ -164,7 +153,8 @@ exports.delete = function (req, res) {
         message: 'User not deleted',
       })
     } else {
-      if (//comparamos si el id del token y el id del usuario que queremos "eliminar" coinciden
+      if (
+        //comparamos si el id del token y el id del usuario que queremos "eliminar" coinciden
         req.params.id == data['data'][0]['user_type'] ||
         data['data'][0]['user_type'] == 3
       ) {
@@ -175,7 +165,8 @@ exports.delete = function (req, res) {
               err,
             })
           } else {
-            User.findById(req.params.id, (err, user) => {//revisamos si el usuario que queremos eliminar existe
+            User.findById(req.params.id, (err, user) => {
+              //revisamos si el usuario que queremos eliminar existe
               if (err) {
                 res.status(500).send({
                   error: true,
@@ -215,19 +206,73 @@ exports.login = function (req, res) {
         err,
       })
     } else {
-      let date_ob = new Date()
-      let Toeknkey =
-        date_ob.getFullYear() +
-        '/' +
-        date_ob.getMonth() +
-        '/' +
-        date_ob.getDate()
+      var axios = require('axios')
+      User.endpoint('create_token', (err, db) => {
+        if (err) {
+          console.log(err)
+          result = err
+        } else {
+          url = JSON.parse(db[0]['url'])
+          var config = {
+            method: 'post',
+            url: url.endpoint,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            data: data,
+          }
 
-      res.status(200).send({
-        status: false,
-        data: data,
-        token: jwt.sign({ data }, Toeknkey),//al iniciar sesion creamos un token que sera el que usaremos para cada api
+          axios(config)
+            .then(function (response) {
+              // console.log(response)
+              res.status(200).send({
+                status: true,
+                data: data,
+                token: response.data.token,
+              })
+            })
+            .catch(function (error) {
+              // console.log(error)
+              // console.log(data)
+            })
+        }
       })
     }
   })
+}
+
+function testToken(token) {
+  var axios = require('axios')
+  var result = ''
+  User.endpoint('verficate_token', (err, data) => {
+    if (err) {
+      console.log(err)
+      result = err
+    } else {
+      url = JSON.parse(data[0]['url'])
+
+      var data = JSON.stringify({
+        token: token,
+      })
+
+      var config = {
+        method: 'post',
+        url: url.endpoint,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: data,
+      }
+
+      axios(config)
+        .then(function (response) {
+          console.log(JSON.stringify(response.data))
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    }
+  })
+
+  return result
 }
