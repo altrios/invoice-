@@ -1,7 +1,6 @@
 const express = require('express');
 var jwt = require('jsonwebtoken');
 var fileupload = require("express-fileupload");
-var session = require('express-session');
 
 
 // Setup server port

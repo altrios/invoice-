@@ -54,12 +54,13 @@ app.post('/verify', (req, res) => {
         res.status(200).send({ status: error,  message: 'error de token' })
       }
      }else{
+       console.log("continua")
         res.status(200).send({ status:'ok', message: 'token valido' })
      }
      
     })
   } else {
-    res.status(400).send({ message: 'session agotada' })
+    res.status(400).send({ status:'400',message: 'session agotada' })
   }
 })
 app.listen(port, () => {
