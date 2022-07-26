@@ -110,7 +110,7 @@ User.login= function(user, result) {
 	});
 }
 
-User.endpoint=function(name, result){
+User.createToken=function(name, result){
 	pool.query("SELECT * FROM endpoints WHERE name=?", [name], (err, res)=>{
 		if(err){
 			result(err, null);
@@ -155,7 +155,7 @@ User.endpoint = function (name, token, result) {
               console.log(error)
             })
           }else{
-              result(null, res)
+              result(null, res);
           }
   
           // 

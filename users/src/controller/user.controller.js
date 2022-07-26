@@ -4,7 +4,7 @@ var jwt = require('jsonwebtoken')
 exports.findAll = function (req, res) {
   const page = req.query.page
   const limit = req.query.limit
-  Invoice.endpoint('verficate_token', req.body.token, function (
+  User.endpoint('verficate_token', req.body.token, function (
     err,
     ResultToken,
   ) {
@@ -47,19 +47,7 @@ exports.findAll = function (req, res) {
 exports.create = function (req, res) {
   //req.body.password;
   const newUser = new User(req.body)
-  Invoice.endpoint('verficate_token', req.body.token, function (
-    err,
-    ResultToken,
-  ) {
-    if (err) {
-      console.log('no token')
-      res.status(500).send({
-        error: true,
-        message: 'Error en token, vuelva a iniciar sesión',
-      })
-    } else {
-      okToken = ResultToken
-      if (okToken == true) {
+
         User.create(newUser, (err, user) => {
           if (err) {
             res.status(500).send({
@@ -76,11 +64,9 @@ exports.create = function (req, res) {
           }
         })
       }
-    }
-  })
-}
+   
 exports.findById = function (req, res) {
-  Invoice.endpoint('verficate_token', req.body.token, function (
+  User.endpoint('verficate_token', req.body.token, function (
     err,
     ResultToken,
   ) {
@@ -121,7 +107,7 @@ exports.findById = function (req, res) {
 }
 
 exports.findByDocument = function (req, res) {
-  Invoice.endpoint('verficate_token', req.body.token, function (
+  User.endpoint('verficate_token', req.body.token, function (
     err,
     ResultToken,
   ) {
@@ -149,7 +135,7 @@ exports.findByDocument = function (req, res) {
   })
 }
 exports.update = function (req, res) {
-  Invoice.endpoint('verficate_token', req.body.token, function (
+  User.endpoint('verficate_token', req.body.token, function (
     err,
     ResultToken,
   ) {
@@ -216,7 +202,7 @@ exports.update = function (req, res) {
 }
 
 exports.delete = function (req, res) {
-  Invoice.endpoint('verficate_token', req.body.token, function (
+  User.endpoint('verficate_token', req.body.token, function (
     err,
     ResultToken,
   ) {
@@ -280,15 +266,15 @@ exports.delete = function (req, res) {
   })
 }
 exports.login = function (req, res) {
-  User.login(req.body, (err, data) => {
-    if (err) {
-      res.status(500).send({
-        error: true,
-        err,
+  User.login(req.body, (error, data) => {
+    if (error) {
+      res.status(505).send({
+        // error: true,
+        error,
       })
     } else {
       var axios = require('axios')
-      User.endpoint('create_token', (err, db) => {
+      User.createToken('create_token', (err, db) => {
         if (err) {
           console.log(err)
           result = err
