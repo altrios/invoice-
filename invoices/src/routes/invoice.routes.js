@@ -34,7 +34,7 @@ router.get('/:id', celebrate({
     res.status(400).send({ status: false, message: 'Faltan datos por enviar' });
 }, invoiceController.findById);
 
-router.get('/user/:id/', celebrate({
+router.post('/user/:id/', celebrate({
     params: Joi.object().keys({
         id: Joi.number().integer().positive().required(),
     }).unknown(),
